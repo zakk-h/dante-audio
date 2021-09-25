@@ -14,6 +14,7 @@
 	html, body {margin:0;padding:0;background:black;user-select:none;}
 	header {text-align:center; padding:0.5rem;margin-bottom:1rem;color:yellow;background:darkred;}
 	button {margin:0.5rem; border-radius:0.4rem; color:darkblue; font-size:larger; font-weight:bold;background:lightgray;}
+	button:focus {border:solid #060 0.8rem;}
 	div.idle {text-align:center; padding:0.25em; padding-bottom:1rem;}
 	.idle button {width:40%; height:4em;}
 	.performance button {display:block; width:90%; height:35vh; margin:0.5rem auto;}
@@ -35,7 +36,7 @@
 	<div class="idle" id="id_readyblock">
 		<button id="id_ready">Ready!</button>
 	</div>
-	<div class="performance hidden" id="id_audiopads">
+	<div class="performance" id="id_audiopads">
 		<button id="id_snd1" data-snd="1.01Prologue.ogg" data-nextid="id_snd2">1-1 Prologue</button>
 		<button id="id_snd2" data-snd="1.02Poet.ogg" data-nextid="id_snd3">1-2 Poet</button>
 		<button id="id_snd3" data-snd="1.03HisName.ogg" data-nextid="id_snd4">1-3 His Name</button>

@@ -2,7 +2,6 @@ import './index.html';
 import './app.manifest';
 import '!!file-loader?name=[name].[ext]!./icon-192.webp';
 import '!!file-loader?name=[name].[ext]!./icon-512.webp';
-import  './samples/ready.ogg';
 import  './samples/Test-1-2.ogg';
 import  './samples/Ding-Ding.ogg';
 import  './samples/ThunderClap.ogg';
@@ -37,26 +36,38 @@ function init_dante()
 {
 	let isReady = false;
 	let midiAccepted = false;
-	let loadedSounds = [];
+	let loadedSounds = {};
 	let readyBtn = document.querySelector('#id_ready');
 	let audiocheckBlock = document.querySelector('#id_audiocheck');
-	let readyBlock1 = document.querySelector('#id_audiopads');
-	let readyBlock2 = document.querySelector('#id_doneblock');
+	let doneBlock = document.querySelector('#id_doneblock');
 
 	let wakeLock = null;
+	let midiLockoutUntil = Date.now() - 100;
 	let nextSound = false;
 
 	document.querySelector('#buildts').textContent = __BUILD_TIMESTAMP__;
-	let readySnd = new Pizzicato.Sound({source:'file',options:{path:'ready.ogg',loop:true}}, function() {
-		loadedSounds.push('ready.ogg');
-	});
+
+	function setNextSoundBtn(nextBtnID) {
+		nextSound = nextBtnID;
+		setTimeout(function() {
+			let elem = document.querySelector(`#${nextSound}`);
+			elem.focus();
+			elem.scrollIntoView(false);
+		},250);
+	}
 
 	function handleMidiMessage(msg) {
 		let mm = msg.data;
+		let clockNow = Date.now();
 		console.log(`midi message ${mm[0]}:${mm[1]}:${mm[2]}`)
 		if (isReady && nextSound && (mm[1] == 64) && (mm[2]>0)) {
-			console.log(`sustain pressed, ${nextSound} is next`);
-			document.querySelector(nextSound).click();
+			if (clockNow > midiLockoutUntil) {
+				console.log(`sustain pressed, ${nextSound} is next`);
+				midiLockoutUntil = clockNow + 3000;
+				document.querySelector(`#${nextSound}`).click();
+			} else {
+				console.log(`sustain ignored due to timed lockout`);
+			}
 		}
 	}
 	function initMidi(access) {
@@ -75,12 +86,10 @@ function init_dante()
 
 		if (b == isReady) return;
 		if (b) {
-			readyBlock1.classList.remove('hidden');
-			readyBlock1.classList.remove('hidden');
+			doneBlock.classList.remove('hidden');
 			audiocheckBlock.classList.add('hidden');
 			readyBtn.classList.add('playing');
-			readySnd.play();
-			nextSound = '#id_snd1';
+			setNextSoundBtn('id_snd1');
 			if ('wakeLock' in navigator) {
 				try {
 					wakeLock = await navigator.wakeLock.request('screen');
@@ -91,10 +100,8 @@ function init_dante()
 			}
 		} else {
 			audiocheckBlock.classList.remove('hidden');
-			readyBlock1.classList.add('hidden');
-			readyBlock1.classList.add('hidden');
+			doneBlock.classList.add('hidden');
 			readyBtn.classList.remove('playing');
-			readySnd.stop();
 			window.scrollTo(0,0);
 			if (wakeLock) {
 				wakeLock.release().then(() => {
@@ -113,19 +120,28 @@ function init_dante()
 		let sndFile = btn.dataset.snd;
 		let nextBtnID = btn.dataset.nextid;
 		let snd = new Pizzicato.Sound({source:'file',options:{path:sndFile}}, function() {
-			loadedSounds.push(sndFile);
+			loadedSounds[btn.id] = sndFile;
 		});
 
-		btn.addEventListener('click',function() {snd.play();});
+		btn.addEventListener('click',function(e) {
+			e.preventDefault();
+			if (btn.classList.contains('playing')) {
+				snd.stop();
+				if (isReady) setNextSoundBtn(btn.id);
+			} else {
+				if (isReady) {
+					// when in wake-lock/midi-mode, only the `nextSound` with focus can be played
+					if (btn.id == nextSound) snd.play();
+					else setNextSoundBtn(btn.id);
+				} else {
+					snd.play();
+				}
+			}
+		});
 
 		snd.on('play', function() {
 			btn.classList.add('playing');
-			if (nextBtnID) {
-				nextSound = '#'+nextBtnID;
-				setTimeout(function() {
-					document.querySelector(nextSound).scrollIntoView(false);
-				},500);
-			}
+			if (isReady && nextBtnID) setNextSoundBtn(nextBtnID);
 		});
 		function stopPlay() {btn.classList.remove('playing');}
 		snd.on('stop', stopPlay);
