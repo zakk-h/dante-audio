@@ -96,9 +96,13 @@ function danteAudioApp()
 	function initMidi(access) {
 		console.log('midi init');
 		let inputs = access.inputs;
+		function bindToMidiInputs(port) {port.addEventListener("midimessage", handleMidiMessage);}
 		inputs.forEach(function(port) {
-			port.addEventListener("midimessage", handleMidiMessage);
+			bindToMidiInputs(port);
 		});
+		access.onstatechange = function(e) {
+			if (e.port.state == "connected") bindToMidiInputs(e.port);
+		}
 	}
 
 	// this activates the live performance mode
