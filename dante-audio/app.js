@@ -6,7 +6,7 @@ import  './samples/Test-1-2.ogg';
 import  './samples/Ding-Ding.ogg';
 import  './samples/ThunderClap.ogg';
 import  './samples/WILDCAT.ogg';
-import  './samples/test-chimes.ogg';
+import  './samples/test-stereo-chimes.ogg';
 import  './samples/test-drum.ogg';
 import  './samples/test-wind.ogg';
 import  './samples/1.01Prologue.ogg';
@@ -21,20 +21,26 @@ import  './samples/4.01Paradiso.ogg';
 import  './samples/4.02AtLast.ogg';
 import Pizzicato from 'pizzicato';
 
-function acceptMidi(fn)
-{
-	if (!navigator.requestMIDIAccess) {return false;}
+/***
+On app startup, all audio buttons are connected to their respective sounds. The sounds can be
+triggered via click/touch interface.
 
-	try {
-		navigator.requestMIDIAccess({software:true}).then(fn);
-	} catch(e) {
-		console.log('midi fail');
-	}
-}
+The `Go Live!` button establishes several things:
+	- Wake Lock (the screen is kept on)
+	- Connection to all MIDI devices
+	- Starts Ready/Live mode
 
-function init_dante()
+In this performance mode, sound pads behave differently:
+	- all sounds are expected to be played in sequence
+	- click/touch events only trigger audio for the next active sound
+	- MIDI Sustain Pedal Down events are considered a click for for the next active sound
+	- out of sequence click/touch moves the target of the next sound pointer to that button
+	- MIDI Sustain Pedal events are throttled to once for every 3 seconds
+***/
+
+function danteAudioApp()
 {
-	let isReady = false;
+	let inLivePerformMode = false;
 	let midiAccepted = false;
 	let loadedSounds = {};
 	let readyBtn = document.querySelector('#id_ready');
@@ -47,6 +53,20 @@ function init_dante()
 
 	document.querySelector('#buildts').textContent = __BUILD_TIMESTAMP__;
 
+	// this reqwuests MIDI access
+	function acceptMidiVia(fn) {
+		function midifail() {midiAccepted=false; console.log('midi fail');}
+		try {
+			if (navigator.requestMIDIAccess) {
+				midiAccepted = true;
+				navigator.requestMIDIAccess().then(fn,midifail);
+			}
+		} catch(e) {
+			midifail();
+		}
+	}
+
+	// this sets the target for the next sound in Live mode
 	function setNextSoundBtn(nextBtnID) {
 		nextSound = nextBtnID;
 		setTimeout(function() {
@@ -56,11 +76,12 @@ function init_dante()
 		},250);
 	}
 
+	// this handles midi messages from any connected device
 	function handleMidiMessage(msg) {
 		let mm = msg.data;
 		let clockNow = Date.now();
 		console.log(`midi message ${mm[0]}:${mm[1]}:${mm[2]}`)
-		if (isReady && nextSound && (mm[1] == 64) && (mm[2]>0)) {
+		if (inLivePerformMode && nextSound && (mm[1] == 64) && (mm[2]>0)) {
 			if (clockNow > midiLockoutUntil) {
 				console.log(`sustain pressed, ${nextSound} is next`);
 				midiLockoutUntil = clockNow + 3000;
@@ -70,6 +91,8 @@ function init_dante()
 			}
 		}
 	}
+	// this connect to all MIDI input devices; currently, only midi devices connected when live mode 
+	// is first initiated are attached; we need to handle `MIDIConnectionEvent` to do more
 	function initMidi(access) {
 		console.log('midi init');
 		let inputs = access.inputs;
@@ -78,13 +101,13 @@ function init_dante()
 		});
 	}
 
-	async function makeReady(b) {
+	// this activates the live performance mode
+	async function livePerformActivate(b) {
 		if (!midiAccepted) {
-			midiAccepted = true;
-			acceptMidi(initMidi);
+			acceptMidiVia(initMidi);
 		}
 
-		if (b == isReady) return;
+		if (b == inLivePerformMode) return;
 		if (b) {
 			doneBlock.classList.remove('hidden');
 			audiocheckBlock.classList.add('hidden');
@@ -110,11 +133,13 @@ function init_dante()
 				});
 			}
 		}
-		isReady = b;
+		inLivePerformMode = b;
 	}
-	readyBtn.addEventListener('click', function() {makeReady(!isReady);});
-	document.querySelector('#id_done').addEventListener('click', function() {makeReady(false);});
+	
+	readyBtn.addEventListener('click', function() {livePerformActivate(!inLivePerformMode);});
+	document.querySelector('#id_done').addEventListener('click', function() {livePerformActivate(false);});
 
+	// loop through all sound buttons and establish their sound and click handler
 	let sndFiles = document.querySelectorAll('button[data-snd]');
 	sndFiles.forEach(function(btn) {
 		let sndFile = btn.dataset.snd;
@@ -127,10 +152,10 @@ function init_dante()
 			e.preventDefault();
 			if (btn.classList.contains('playing')) {
 				snd.stop();
-				if (isReady) setNextSoundBtn(btn.id);
+				if (inLivePerformMode) setNextSoundBtn(btn.id);
 			} else {
-				if (isReady) {
-					// when in wake-lock/midi-mode, only the `nextSound` with focus can be played
+				if (inLivePerformMode) {
+					// when in live mode, only the `nextSound` with focus can be played
 					if (btn.id == nextSound) snd.play();
 					else setNextSoundBtn(btn.id);
 				} else {
@@ -141,7 +166,7 @@ function init_dante()
 
 		snd.on('play', function() {
 			btn.classList.add('playing');
-			if (isReady && nextBtnID) setNextSoundBtn(nextBtnID);
+			if (inLivePerformMode && nextBtnID) setNextSoundBtn(nextBtnID);
 		});
 		function stopPlay() {btn.classList.remove('playing');}
 		snd.on('stop', stopPlay);
@@ -149,4 +174,4 @@ function init_dante()
 	});
 }
 
-init_dante();
+danteAudioApp();
