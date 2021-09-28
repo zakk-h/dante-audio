@@ -11,23 +11,53 @@
 	}
 </script>
 <style>
-	html, body {margin:0;padding:0;background:black;user-select:none;}
+	html, body {margin:0;padding:0;background:black;color:rgb(208, 234, 245); user-select:none;}
 	header {text-align:center; padding:0.5rem;margin-bottom:1rem;color:yellow;background:darkred;}
+	div.preamble {padding:0 1rem; max-width:800px; margin:0 auto;}
 	button {margin:0.5rem; border-radius:0.4rem; color:darkblue; font-size:larger; font-weight:bold;background:lightgray;}
 	button:focus {border:solid #060 0.8rem;}
 	div.idle {text-align:center; padding:0.25em; padding-bottom:1rem;}
+	div.performance {text-align:center; padding:0.25em;}
 	.idle button {width:40%; height:4em;}
 	.performance button {display:block; width:90%; height:35vh; margin:0.5rem auto;}
 	button.playing {background:green;}
 	.hidden {display:none;}
+	.centered {text-align:center;}
 </style>
 </head>	
 <body>
-	<header><b>Dante Audio</b> - <span id="buildts">Vintage</span></header>
+<header><b>Dante Audio</b> - <span id="buildts">Vintage</span></header>
+<div class="preamble" id="id_preamble">
+<h1>Introduction</h1>	
+<p class="centered">
+	<button id="id_start">Get Started</button>
+</p>
+<p>
+	On app startup, all audio buttons are connected to their respective sounds.
+	The sounds can be triggered via click/touch interface.
+</p><p>
+	The <b>Go Live!</b> button establishes several things:
+	<ul>
+		<li>Wake Lock (the screen is kept on)</li>
+		<li>Connection to all MIDI devices</li>
+		<li>Starts Ready/Live mode</li>
+	</ul>	
+</p><p>
+	In this performance mode, sound pads behave differently:
+	<ul>
+		<li>all sounds are expected to be played in sequence</li>
+		<li>click/touch events only trigger audio for the next active sound</li>
+		<li>MIDI Sustain Pedal Down anf Note On events are considered a click for for the next active sound</li>
+		<li>out of sequence click/touch moves the target of the next sound pointer to that button</li>
+		<li>MIDI trigger events are throttled to once for every 3 seconds</li>
+	</ul>
+</p>
+</div>
+<div class="app hidden" id="appDante">
 	<div class="idle" id="id_audiocheck">
 		<button data-snd="Test-1-2.ogg">Test 1 2</button>
 		<button data-snd="Ding-Ding.ogg">Ding Ding</button>
-		<button data-snd="2.02Scream.ogg">Scream</button>
+		<button data-snd="2-3-Scream.ogg">Scream</button>
 		<button data-snd="ThunderClap.ogg">Thunder</button>
 		<button data-snd="WILDCAT.ogg">Wildcat!</button>
 		<button data-snd="test-stereo-chimes.ogg">chimes</button>
@@ -38,20 +68,24 @@
 		<button id="id_ready">Go Live!</button>
 	</div>
 	<div class="performance" id="id_audiopads">
-		<button id="id_snd1" data-snd="1.01Prologue.ogg" data-nextid="id_snd2">1-1 Prologue</button>
-		<button id="id_snd2" data-snd="1.02Poet.ogg" data-nextid="id_snd3">1-2 Poet</button>
-		<button id="id_snd3" data-snd="1.03HisName.ogg" data-nextid="id_snd4">1-3 His Name</button>
-		<button id="id_snd4" data-snd="1.04Thunder.ogg" data-nextid="id_snd5">1-4 Thunder</button>
-		<button id="id_snd5" data-snd="2.01Inferno.ogg" data-nextid="id_snd6">2-1 Inferno</button>
-		<button id="id_snd6" data-snd="2.02Scream.ogg" data-nextid="id_snd7">2-2 Scream</button>
-		<button id="id_snd7" data-snd="3.01Purgatorio.ogg" data-nextid="id_snd8">3-1 Purgatorio</button>
-		<button id="id_snd8" data-snd="3.02Wind.ogg" data-nextid="id_snd9">3-2 Wind</button>
-		<button id="id_snd9" data-snd="4.01Paradiso.ogg" data-nextid="id_snd10">4-1 Paradiso</button>
-		<button id="id_snd10" data-snd="4.02AtLast.ogg" data-nextid="id_done">4-2 At Last</button>
+		<button id="id_snd1" data-snd="1-1-Thunder.ogg" data-nextid="id_snd2">1-1 Thunder</button>
+		<button id="id_snd2" data-snd="1-2-WhatLiesBeyond.ogg" data-nextid="id_snd3">1-2 What Lies Beyond</button>
+		<button id="id_snd3" data-snd="1-3-WhatBecomesOfTheSouls.ogg" data-nextid="id_snd4">1-3 What Becomes Of Souls</button>
+		<button id="id_snd4" data-snd="1-4-OnePoetPainted.ogg" data-nextid="id_snd5">1-4 One Poet Painted</button>
+		<button id="id_snd5" data-snd="1-5-HisNameWasDante.ogg" data-nextid="id_snd6">1-5 Name Was Dante</button>
+		<button id="id_snd6" data-snd="1-6Thunderclap.ogg" data-nextid="id_snd7">1-6 Thunderclap</button>
+		<button id="id_snd7" data-snd="2-1-AbandonHope.ogg" data-nextid="id_snd8">2-1 Abandon Hope</button>
+		<button id="id_snd8" data-snd="2-2-EvilLaugh.ogg" data-nextid="id_snd9">2-2 Evil Laugh</button>
+		<button id="id_snd9" data-snd="2-3-Scream.ogg" data-nextid="id_snd10">2-3 Scream</button>
+		<button id="id_snd10" data-snd="3-1-NowComeWe.ogg" data-nextid="id_snd11">3-1 Now Come We</button>
+		<button id="id_snd11" data-snd="3-3-Wind2.ogg" data-nextid="id_snd12">3-3 Wind2</button>
+		<button id="id_snd12" data-snd="4-1-UpUpAndUp.ogg" data-nextid="id_snd13">4-1 Up Up And Up</button>
+		<button id="id_snd13" data-snd="4-2-UntilAtLastParadise.ogg" data-nextid="id_done">4-2 At Last Paradise</button>
 	</div>
 	<div class="idle hidden" id="id_doneblock">
 		<button id="id_done">Done!</button>
 	</div>
+</div>
 <script async src="./app.js"></script>
 </body>
 </html>

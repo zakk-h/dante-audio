@@ -9,16 +9,19 @@ import  './samples/WILDCAT.ogg';
 import  './samples/test-stereo-chimes.ogg';
 import  './samples/test-drum.ogg';
 import  './samples/test-wind.ogg';
-import  './samples/1.01Prologue.ogg';
-import  './samples/1.02Poet.ogg';
-import  './samples/1.03HisName.ogg';
-import  './samples/1.04Thunder.ogg';
-import  './samples/2.01Inferno.ogg';
-import  './samples/2.02Scream.ogg';
-import  './samples/3.01Purgatorio.ogg';
-import  './samples/3.02Wind.ogg';
-import  './samples/4.01Paradiso.ogg';
-import  './samples/4.02AtLast.ogg';
+import  './samples/1-1-Thunder.ogg';
+import  './samples/1-2-WhatLiesBeyond.ogg';
+import  './samples/1-3-WhatBecomesOfTheSouls.ogg';
+import  './samples/1-4-OnePoetPainted.ogg';
+import  './samples/1-5-HisNameWasDante.ogg';
+import  './samples/1-6Thunderclap.ogg';
+import  './samples/2-1-AbandonHope.ogg';
+import  './samples/2-2-EvilLaugh.ogg';
+import  './samples/2-3-Scream.ogg';
+import  './samples/3-1-NowComeWe.ogg';
+import  './samples/3-3-Wind2.ogg';
+import  './samples/4-1-UpUpAndUp.ogg';
+import  './samples/4-2-UntilAtLastParadise.ogg';
 import Pizzicato from 'pizzicato';
 
 /***
@@ -33,9 +36,9 @@ The `Go Live!` button establishes several things:
 In this performance mode, sound pads behave differently:
 	- all sounds are expected to be played in sequence
 	- click/touch events only trigger audio for the next active sound
-	- MIDI Sustain Pedal Down events are considered a click for for the next active sound
+	- MIDI Sustain Pedal Down anf Note On events are considered a click for for the next active sound
 	- out of sequence click/touch moves the target of the next sound pointer to that button
-	- MIDI Sustain Pedal events are throttled to once for every 3 seconds
+	- MIDI trigger events are throttled to once for every 3 seconds
 ***/
 
 function danteAudioApp()
@@ -51,9 +54,7 @@ function danteAudioApp()
 	let midiLockoutUntil = Date.now() - 100;
 	let nextSound = false;
 
-	document.querySelector('#buildts').textContent = __BUILD_TIMESTAMP__;
-
-	// this reqwuests MIDI access
+	// this requests MIDI access
 	function acceptMidiVia(fn) {
 		function midifail() {midiAccepted=false; console.log('midi fail');}
 		try {
@@ -76,18 +77,36 @@ function danteAudioApp()
 		},250);
 	}
 
+	// looks for sustain pedal or certain note on events
+	function midiShouldTriggerNextSound(mm) {
+		let msgCode = mm[0] & 0xF0;
+		
+		switch (msgCode) {
+			case 0xB0:
+				// midi sustain pedal triggers next sound
+				return (mm[1] == 64) && (mm[2]>0);
+			case 0x90:
+				// midi note on event triggers next sound
+				return mm[2]>0;
+			default:
+				break;
+		}
+
+		return false;
+	}
+
 	// this handles midi messages from any connected device
 	function handleMidiMessage(msg) {
 		let mm = msg.data;
 		let clockNow = Date.now();
 		console.log(`midi message ${mm[0]}:${mm[1]}:${mm[2]}`)
-		if (inLivePerformMode && nextSound && (mm[1] == 64) && (mm[2]>0)) {
+		if (inLivePerformMode && nextSound && midiShouldTriggerNextSound(mm)) {
 			if (clockNow > midiLockoutUntil) {
-				console.log(`sustain pressed, ${nextSound} is next`);
+				console.log(`trigger engaged, ${nextSound} is next`);
 				midiLockoutUntil = clockNow + 3000;
 				document.querySelector(`#${nextSound}`).click();
 			} else {
-				console.log(`sustain ignored due to timed lockout`);
+				console.log(`trigger ignored due to timed lockout`);
 			}
 		}
 	}
@@ -178,4 +197,10 @@ function danteAudioApp()
 	});
 }
 
-danteAudioApp();
+document.querySelector('#buildts').textContent = __BUILD_TIMESTAMP__;
+document.querySelector('#id_start').addEventListener('click',function() {
+	document.querySelector('#appDante').classList.remove('hidden');
+	document.querySelector('#id_preamble').classList.add('hidden');
+	danteAudioApp();
+});
+
