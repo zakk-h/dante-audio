@@ -2,10 +2,10 @@ import './index.html';
 import './app.manifest';
 import '!!file-loader?name=[name].[ext]!./icon-192.webp';
 import '!!file-loader?name=[name].[ext]!./icon-512.webp';
-import  './samples/Test-1-2.ogg';
+//import  './samples/Test-1-2.ogg';
 import  './samples/Ding-Ding.ogg';
-import  './samples/ThunderClap.ogg';
-import  './samples/WILDCAT.ogg';
+import  './samples/test-thunder.ogg';
+//import  './samples/WILDCAT.ogg';
 import  './samples/test-stereo-chimes.ogg';
 import  './samples/test-drum.ogg';
 import  './samples/test-wind.ogg';
@@ -14,13 +14,15 @@ import  './samples/1-2-WhatLiesBeyond.ogg';
 import  './samples/1-3-WhatBecomesOfTheSouls.ogg';
 import  './samples/1-4-OnePoetPainted.ogg';
 import  './samples/1-5-HisNameWasDante.ogg';
-import  './samples/1-6Thunderclap.ogg';
+import  './samples/1-6-ImpactDrum.ogg';
+import  './samples/1-7-ThunderClap.ogg';
 import  './samples/2-1-AbandonHope.ogg';
 import  './samples/2-2-EvilLaugh.ogg';
-import  './samples/2-3-Scream.ogg';
+import  './samples/2-3-Crunch.ogg';
+import  './samples/2-4-Scream.ogg';
 import  './samples/3-1-NowComeWe.ogg';
-import  './samples/3-3-Wind2.ogg';
-import  './samples/4-1-UpUpAndUp.ogg';
+import  './samples/3-2-Wind.ogg';
+import  './samples/4-1-UpAndUpAndUp.ogg';
 import  './samples/4-2-UntilAtLastParadise.ogg';
 import Pizzicato from 'pizzicato';
 
@@ -36,9 +38,9 @@ The `Go Live!` button establishes several things:
 In this performance mode, sound pads behave differently:
 	- all sounds are expected to be played in sequence
 	- click/touch events only trigger audio for the next active sound
-	- MIDI Sustain Pedal Down anf Note On events are considered a click for for the next active sound
+	- MIDI Sustain Pedal Down and Note On events are considered a click for for the next active sound
 	- out of sequence click/touch moves the target of the next sound pointer to that button
-	- MIDI trigger events are throttled to once for every 3 seconds
+	- MIDI trigger events are throttled to once for every 1.5 seconds
 ***/
 
 function danteAudioApp()
@@ -103,7 +105,7 @@ function danteAudioApp()
 		if (inLivePerformMode && nextSound && midiShouldTriggerNextSound(mm)) {
 			if (clockNow > midiLockoutUntil) {
 				console.log(`trigger engaged, ${nextSound} is next`);
-				midiLockoutUntil = clockNow + 3000;
+				midiLockoutUntil = clockNow + 1500;
 				document.querySelector(`#${nextSound}`).click();
 			} else {
 				console.log(`trigger ignored due to timed lockout`);
