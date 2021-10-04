@@ -162,6 +162,21 @@ function danteAudioApp()
 	readyBtn.addEventListener('click', function() {livePerformActivate(!inLivePerformMode);});
 	document.querySelector('#id_done').addEventListener('click', function() {livePerformActivate(false);});
 
+	document.onkeydown = function(e) {
+		if (e.key == 'b') {
+			let clockNow = Date.now();
+			if (inLivePerformMode && nextSound) {
+				if (clockNow > midiLockoutUntil) {
+					console.log(`pedal-key trigger engaged, ${nextSound} is next`);
+					midiLockoutUntil = clockNow + 3000;
+					document.querySelector(`#${nextSound}`).click();
+				} else {
+					console.log(`pedal-key trigger ignored due to timed lockout`);
+				}
+			}
+		}
+	}
+
 	// loop through all sound buttons and establish their sound and click handler
 	let sndFiles = document.querySelectorAll('button[data-snd]');
 	sndFiles.forEach(function(btn) {
