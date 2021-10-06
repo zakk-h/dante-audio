@@ -24,6 +24,7 @@ import  './samples/3-1-NowComeWe.ogg';
 import  './samples/3-2-Wind.ogg';
 import  './samples/4-1-UpAndUpAndUp.ogg';
 import  './samples/4-2-UntilAtLastParadise.ogg';
+import './samples/synth.ogg';
 import Pizzicato from 'pizzicato';
 
 /***
