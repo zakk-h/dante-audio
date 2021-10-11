@@ -19,7 +19,7 @@
 	div.idle {text-align:center; padding:0.25em; padding-bottom:1rem;}
 	div.performance {text-align:center; padding:0.25em;}
 	.idle button {width:40%; height:4em;}
-	.performance button {display:block; width:90%; height:35vh; margin:0.5rem auto;}
+	.performance button {width:42%; height:5em;}
 	button.playing {background:green;}
 	.hidden {display:none;}
 	.centered {text-align:center;}
@@ -55,22 +55,20 @@
 </div>
 <div class="app hidden" id="appDante">
 	<div class="idle" id="id_audiocheck">
-		<!---<button data-snd="Test-1-2.ogg">Test 1 2</button>--->
 		<button data-snd="Ding-Ding.ogg">Ding Ding</button>
 		<button data-snd="1-6-ImpactDrum.ogg">Impact Drum</button>
-		<!---<button data-snd="2-4-Scream.ogg">Scream</button>--->
-		<!---<button data-snd="WILDCAT.ogg">Wildcat!</button>--->
 		<button data-snd="test-thunder.ogg">Thunder</button>
 		<button data-snd="test-stereo-chimes.ogg">Chimes</button>
 		<button data-snd="test-drum.ogg">Drumroll</button>
 		<button data-snd="test-wind.ogg">Wind</button>
 		<button data-snd="synth.ogg">Synth</button>
+		<button data-snd="TrueThunderClap.ogg">True Thunder</button>
 	</div>
 	<div class="idle" id="id_readyblock">
 		<button id="id_ready">Go Live!</button>
 	</div>
 	<div class="performance" id="id_audiopads">
-		<button id="id_snd1" data-snd="1-1-Thunder.ogg" data-nextid="id_snd2">1-1 Thunder</button>
+		<button id="id_snd1" data-snd="1-1-Thunder.ogg" data-loudness="1" data-nextid="id_snd2">1-1 Thunder</button>
 		<button id="id_snd2" data-snd="1-2-WhatLiesBeyond.ogg" data-nextid="id_snd3">1-2 What Lies Beyond</button>
 		<button id="id_snd3" data-snd="1-3-WhatBecomesOfTheSouls.ogg" data-nextid="id_snd4">1-3 What Becomes Of Souls</button>
 		<button id="id_snd4" data-snd="1-4-OnePoetPainted.ogg" data-nextid="id_snd5">1-4 One Poet Painted</button>
@@ -80,7 +78,7 @@
 		<button id="id_snd8" data-snd="2-1-AbandonHope.ogg" data-nextid="id_snd9">2-1 Abandon Hope</button>
 		<button id="id_snd9" data-snd="2-2-EvilLaugh.ogg" data-nextid="id_snd10">2-2 Evil Laugh</button>
 		<button id="id_snd10" data-snd="2-3-Crunch.ogg" data-nextid="id_snd11">2-3 Crunch</button>
-		<button id="id_snd11" data-snd="2-4-Scream.ogg" data-nextid="id_snd12">2-4 Scream</button>
+		<button id="id_snd11" data-snd="2-4-Scream.ogg" data-loudness="1" data-nextid="id_snd12">2-4 Scream</button>
 		<button id="id_snd12" data-snd="3-1-NowComeWe.ogg" data-nextid="id_snd13">3-1 Now Come We</button>
 		<button id="id_snd13" data-snd="3-2-Wind.ogg" data-nextid="id_snd14">3-3 Wind2</button>
 		<button id="id_snd14" data-snd="4-1-UpAndUpAndUp.ogg" data-nextid="id_snd15">4-1 Up Up And Up</button>
