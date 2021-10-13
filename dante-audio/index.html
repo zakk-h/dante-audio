@@ -13,16 +13,15 @@
 <style>
 	html, body {margin:0;padding:0;background:black;color:rgb(208, 234, 245); user-select:none;}
 	header {text-align:center; padding:0.5rem;margin-bottom:1rem;color:yellow;background:darkred;}
-	div.preamble {padding:0 1rem; max-width:800px; margin:0 auto;}
-	button {margin:0.5rem; border-radius:0.4rem; color:darkblue; font-size:larger; font-weight:bold;background:lightgray;}
-	button:focus {border:solid #060 0.8rem;}
-	div.idle {text-align:center; padding:0.25em; padding-bottom:1rem;}
-	div.performance {text-align:center; padding:0.25em;}
-	.idle button {width:40%; height:4em;}
-	.performance button {width:42%; height:5em;}
+
+	button {min-width:10rem;min-height:4rem;margin:0.5rem; border-radius:0.4rem; color:darkblue; font-size:larger; font-weight:bold;background:lightgray;}
 	button.playing {background:green;}
-	.hidden {display:none;}
-	.centered {text-align:center;}
+	button:focus {border:solid #060 0.8rem;}
+	.audiopads button {flex:25%;}
+
+	div.preamble {padding:0 1rem; max-width:800px; margin:0 auto;}
+	div.audiopads {display:flex; flex-wrap:wrap; text-align:center; padding:0.25em;}
+	#appDante div {padding-bottom:1rem;}
 	#id_appheader {font-weight: bold;cursor: pointer;}
 	.modal {position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);}
 	.modal-body {color:black; background-color:#fefefe; margin:10% auto; padding:10px; border:1px solid #888; width:80%;}
@@ -33,6 +32,9 @@
 	fieldset.volume {display:flex; padding:0; border:0;}
 	.volume label {flex:auto; display:block; width:50%; padding:0 0.5rem;}
 	.volume control {flex:auto; display:block; width:50%;}
+
+	.hidden {display:none !important;}
+	.centered {text-align:center;}
 </style>
 </head>	
 <body>
@@ -71,7 +73,7 @@
 </p>
 </div>
 <div class="app hidden" id="appDante">
-	<div class="idle" id="id_audiocheck">
+	<div class="audiopads idle" id="id_audiocheck">
 		<button data-snd="Ding-Ding.ogg">Ding Ding</button>
 		<button data-snd="1-6-ImpactDrum.ogg">Impact Drum</button>
 		<button data-snd="test-thunder.ogg">Thunder</button>
@@ -81,10 +83,10 @@
 		<button data-snd="synth.ogg">Synth</button>
 		<button data-snd="TrueThunderClap.ogg">True Thunder</button>
 	</div>
-	<div class="idle" id="id_readyblock">
+	<div class="controlpads centered" id="id_readyblock">
 		<button id="id_ready">Go Live!</button>
 	</div>
-	<div class="performance" id="id_audiopads">
+	<div class="audiopads performance" id="id_audiopads">
 		<button id="id_snd1" data-snd="1-1-Thunder.ogg" data-loudness="100" data-nextid="id_snd2">1-1 Thunder</button>
 		<button id="id_snd2" data-snd="1-2-WhatLiesBeyond.ogg" data-nextid="id_snd3">1-2 What Lies Beyond</button>
 		<button id="id_snd3" data-snd="1-3-WhatBecomesOfTheSouls.ogg" data-nextid="id_snd4">1-3 What Becomes Of Souls</button>
@@ -101,7 +103,7 @@
 		<button id="id_snd14" data-snd="4-1-UpAndUpAndUp.ogg" data-nextid="id_snd15">4-1 Up Up And Up</button>
 		<button id="id_snd15" data-snd="4-2-UntilAtLastParadise.ogg" data-nextid="id_done">4-2 At Last Paradise</button>
 	</div>
-	<div class="idle hidden" id="id_doneblock">
+	<div class="controlpads centered hidden" id="id_doneblock">
 		<button id="id_done">Done!</button>
 	</div>
 </div>
