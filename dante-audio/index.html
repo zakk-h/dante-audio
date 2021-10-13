@@ -23,10 +23,27 @@
 	button.playing {background:green;}
 	.hidden {display:none;}
 	.centered {text-align:center;}
+	#id_appheader {font-weight: bold;cursor: pointer;}
+	.modal {position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);}
+	.modal-body {color:black; background-color:#fefefe; margin:10% auto; padding:10px; border:1px solid #888; width:80%;}
+	.modal-body nav {display:flex; background:#800; justify-content:space-between;}
+	.modal-body nav a {flex:auto; color:#aaa; font-size:28px; font-weight:bold; text-decoration:none; padding:0 0.5rem; cursor:pointer;}
+	a.close {flex:none !important;}
+	a.close:hover {color:black;}
+	fieldset.volume {display:flex; padding:0; border:0;}
+	.volume label {flex:auto; display:block; width:50%; padding:0 0.5rem;}
+	.volume control {flex:auto; display:block; width:50%;}
 </style>
 </head>	
 <body>
-<header><b>Dante Audio</b> - <span id="buildts">Vintage</span></header>
+<header><a id="id_appheader">Dante Audio</a> - <span id="buildts">Vintage</span></header>
+<div class="modal hidden" id="id_dlgoptions">
+<div class="modal-body">
+<nav><a class="title">Volume</a><a class="close">&times;</a></nav>
+<section></section>
+</div>
+</div>
+
 <div class="preamble" id="id_preamble">
 <h1>Introduction</h1>	
 <p class="centered">
@@ -68,7 +85,7 @@
 		<button id="id_ready">Go Live!</button>
 	</div>
 	<div class="performance" id="id_audiopads">
-		<button id="id_snd1" data-snd="1-1-Thunder.ogg" data-loudness="1" data-nextid="id_snd2">1-1 Thunder</button>
+		<button id="id_snd1" data-snd="1-1-Thunder.ogg" data-loudness="100" data-nextid="id_snd2">1-1 Thunder</button>
 		<button id="id_snd2" data-snd="1-2-WhatLiesBeyond.ogg" data-nextid="id_snd3">1-2 What Lies Beyond</button>
 		<button id="id_snd3" data-snd="1-3-WhatBecomesOfTheSouls.ogg" data-nextid="id_snd4">1-3 What Becomes Of Souls</button>
 		<button id="id_snd4" data-snd="1-4-OnePoetPainted.ogg" data-nextid="id_snd5">1-4 One Poet Painted</button>
@@ -78,7 +95,7 @@
 		<button id="id_snd8" data-snd="2-1-AbandonHope.ogg" data-nextid="id_snd9">2-1 Abandon Hope</button>
 		<button id="id_snd9" data-snd="2-2-EvilLaugh.ogg" data-nextid="id_snd10">2-2 Evil Laugh</button>
 		<button id="id_snd10" data-snd="2-3-Crunch.ogg" data-nextid="id_snd11">2-3 Crunch</button>
-		<button id="id_snd11" data-snd="2-4-Scream.ogg" data-loudness="1" data-nextid="id_snd12">2-4 Scream</button>
+		<button id="id_snd11" data-snd="2-4-Scream.ogg" data-loudness="100" data-nextid="id_snd12">2-4 Scream</button>
 		<button id="id_snd12" data-snd="3-1-NowComeWe.ogg" data-nextid="id_snd13">3-1 Now Come We</button>
 		<button id="id_snd13" data-snd="3-2-Wind.ogg" data-nextid="id_snd14">3-3 Wind2</button>
 		<button id="id_snd14" data-snd="4-1-UpAndUpAndUp.ogg" data-nextid="id_snd15">4-1 Up Up And Up</button>
