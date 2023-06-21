@@ -7,7 +7,6 @@ import  './samples/test-thunder.ogg';
 import  './samples/test-stereo-chimes.ogg';
 import  './samples/test-drum.ogg';
 import  './samples/test-wind.ogg';
-import  './samples/TrueThunderClap.ogg';
 import  './samples/1-1-Thunder.ogg';
 import  './samples/1-2-WhatLiesBeyond.ogg';
 import  './samples/1-3-WhatBecomesOfTheSouls.ogg';
@@ -107,7 +106,7 @@ function danteAudioApp()
 		if (inLivePerformMode && nextSound && midiShouldTriggerNextSound(mm)) {
 			if (clockNow > midiLockoutUntil) {
 				console.log(`trigger engaged, ${nextSound} is next`);
-				midiLockoutUntil = clockNow + 1500;
+				midiLockoutUntil = clockNow + 1250;
 				document.querySelector(`#${nextSound}`).click();
 			} else {
 				console.log(`trigger ignored due to timed lockout`);
