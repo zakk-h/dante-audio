@@ -13,20 +13,39 @@
 <style>
 	html, body {margin:0;padding:0;background:black;color:rgb(208, 234, 245); user-select:none;}
 	header {text-align:center; padding:0.5rem;margin-bottom:1rem;color:yellow;background:darkred;}
-	div.preamble {padding:0 1rem; max-width:800px; margin:0 auto;}
-	button {margin:0.5rem; border-radius:0.4rem; color:darkblue; font-size:larger; font-weight:bold;background:lightgray;}
-	button:focus {border:solid #060 0.8rem;}
-	div.idle {text-align:center; padding:0.25em; padding-bottom:1rem;}
-	div.performance {text-align:center; padding:0.25em;}
-	.idle button {width:40%; height:4em;}
-	.performance button {display:block; width:90%; height:35vh; margin:0.5rem auto;}
+
+	button {min-width:10rem;min-height:4rem;margin:0.5rem; border-radius:0.4rem; color:darkblue; font-size:larger; font-weight:bold;background:lightgray;}
 	button.playing {background:green;}
-	.hidden {display:none;}
+	button:focus {border:solid #060 0.8rem;}
+	.audiopads button {flex:25%;}
+
+	div.preamble {padding:0 1rem; max-width:800px; margin:0 auto;}
+	div.audiopads {display:flex; flex-wrap:wrap; text-align:center; padding:0.25em;}
+	#appDante div {padding-bottom:1rem;}
+	#id_appheader {font-weight: bold;cursor: pointer;}
+	.modal {position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);}
+	.modal-body {color:black; background-color:#fefefe; margin:10% auto; padding:10px; border:1px solid #888; width:80%;}
+	.modal-body nav {display:flex; background:#800; justify-content:space-between;}
+	.modal-body nav a {flex:auto; color:#aaa; font-size:28px; font-weight:bold; text-decoration:none; padding:0 0.5rem; cursor:pointer;}
+	a.close {flex:none !important;}
+	a.close:hover {color:black;}
+	fieldset.volume {display:flex; padding:0; border:0;}
+	.volume label {flex:auto; display:block; width:50%; padding:0 0.5rem;}
+	.volume control {flex:auto; display:block; width:50%;}
+
+	.hidden {display:none !important;}
 	.centered {text-align:center;}
 </style>
 </head>	
 <body>
-<header><b>Dante Audio</b> - <span id="buildts">Vintage</span></header>
+<header><a id="id_appheader">Dante Audio</a> - <span id="buildts">Vintage</span></header>
+<div class="modal hidden" id="id_dlgoptions">
+<div class="modal-body">
+<nav><a class="title">Volume</a><a class="close">&times;</a></nav>
+<section></section>
+</div>
+</div>
+
 <div class="preamble" id="id_preamble">
 <h1>Introduction</h1>	
 <p class="centered">
@@ -49,45 +68,41 @@
 		<li>click/touch events only trigger audio for the next active sound</li>
 		<li>MIDI Sustain Pedal Down and Note On events are considered a click for for the next active sound</li>
 		<li>out of sequence click/touch moves the target of the next sound pointer to that button</li>
-		<li>MIDI trigger events are throttled to once for every 1.5 seconds</li>
+		<li>MIDI trigger events are throttled to once for every 1.25 seconds</li>
 	</ul>
 </p>
 </div>
 <div class="app hidden" id="appDante">
-	<div class="idle" id="id_audiocheck">
-		<!---<button data-snd="Test-1-2.ogg">Test 1 2</button>--->
+	<div class="audiopads idle" id="id_audiocheck">
 		<button data-snd="Ding-Ding.ogg">Ding Ding</button>
 		<button data-snd="1-6-ImpactDrum.ogg">Impact Drum</button>
-		<!---<button data-snd="2-4-Scream.ogg">Scream</button>--->
-		<!---<button data-snd="WILDCAT.ogg">Wildcat!</button>--->
 		<button data-snd="test-thunder.ogg">Thunder</button>
 		<button data-snd="test-stereo-chimes.ogg">Chimes</button>
 		<button data-snd="test-drum.ogg">Drumroll</button>
 		<button data-snd="test-wind.ogg">Wind</button>
 		<button data-snd="synth.ogg">Synth</button>
 	</div>
-	<div class="idle" id="id_readyblock">
+	<div class="controlpads centered" id="id_readyblock">
 		<button id="id_ready">Go Live!</button>
 	</div>
 	<div class="performance" id="id_audiopads">
-		<button id="id_snd1" data-snd="test-drum.ogg" data-nextid="id_snd2">Intro - Drumroll</button>
-		<button id="id_snd2" data-snd="test-wind.ogg" data-nextid="id_snd3">Intro - Wind</button>
-		<button id="id_snd3" data-snd="1-1-Thunder.ogg" data-nextid="id_snd4">1-1 Thunder</button>
-		<button id="id_snd4" data-snd="1-2-WhatLiesBeyond.ogg" data-nextid="id_snd5">1-2 What Lies Beyond</button>
-		<button id="id_snd5" data-snd="1-3-WhatBecomesOfTheSouls.ogg" data-nextid="id_snd6">1-3 What Becomes Of Souls</button>
-		<button id="id_snd6" data-snd="1-4-OnePoetPainted.ogg" data-nextid="id_snd7">1-4 One Poet Painted</button>
-		<button id="id_snd7" data-snd="1-5-HisNameWasDante.ogg" data-nextid="id_snd8">1-5 Name Was Dante</button>
-		<button id="id_snd8" data-snd="1-6-ImpactDrum.ogg" data-nextid="id_snd9">1-6 Impact Drum</button>
-		<button id="id_snd9" data-snd="1-7-ThunderClap.ogg" data-nextid="id_snd10">1-7 Thunderclap</button>
-		<button id="id_snd10" data-snd="2-1-AbandonHope.ogg" data-nextid="id_snd11">2-1 Abandon Hope</button>
-		<button id="id_snd11" data-snd="2-2-EvilLaugh.ogg" data-nextid="id_snd12">2-2 Evil Laugh</button>
-		<button id="id_snd12" data-snd="2-4-Scream.ogg" data-nextid="id_snd13">2-4 Scream</button>
-		<button id="id_snd13" data-snd="3-1-NowComeWe.ogg" data-nextid="id_snd14">3-1 Now Come We</button>
-		<button id="id_snd14" data-snd="3-2-Wind.ogg" data-nextid="id_snd15">3-3 Wind2</button>
-		<button id="id_snd15" data-snd="4-1-UpAndUpAndUp.ogg" data-nextid="id_snd16">4-1 Up Up And Up</button>
-		<button id="id_snd16" data-snd="4-2-UntilAtLastParadise.ogg" data-nextid="id_done">4-2 At Last Paradise</button>
+		<button id="id_snd1" data-snd="1-1-Thunder.ogg" data-nextid="id_snd2">1-1 Thunder</button>
+		<button id="id_snd2" data-snd="1-2-WhatLiesBeyond.ogg" data-nextid="id_snd3">1-2 What Lies Beyond</button>
+		<button id="id_snd3" data-snd="1-3-WhatBecomesOfTheSouls.ogg" data-nextid="id_snd4">1-3 What Becomes Of Souls</button>
+		<button id="id_snd4" data-snd="1-4-OnePoetPainted.ogg" data-nextid="id_snd5">1-4 One Poet Painted</button>
+		<button id="id_snd5" data-snd="1-5-HisNameWasDante.ogg" data-nextid="id_snd6">1-5 Name Was Dante</button>
+		<button id="id_snd6" data-snd="1-6-ImpactDrum.ogg" data-nextid="id_snd7">1-6 Impact Drum</button>
+		<button id="id_snd7" data-snd="1-7-ThunderClap.ogg" data-nextid="id_snd8">1-7 Thunderclap</button>
+		<button id="id_snd8" data-snd="2-1-AbandonHope.ogg" data-nextid="id_snd9">2-1 Abandon Hope</button>
+		<button id="id_snd9" data-snd="2-2-EvilLaugh.ogg" data-nextid="id_snd10">2-2 Evil Laugh</button>
+		<button id="id_snd10" data-snd="2-3-Crunch.ogg" data-nextid="id_snd11">2-3 Crunch</button>
+		<button id="id_snd11" data-snd="2-4-Scream.ogg" data-nextid="id_snd12">2-4 Scream</button>
+		<button id="id_snd12" data-snd="3-1-NowComeWe.ogg" data-nextid="id_snd13">3-1 Now Come We</button>
+		<button id="id_snd13" data-snd="3-2-Wind.ogg" data-nextid="id_snd14">3-3 Wind2</button>
+		<button id="id_snd14" data-snd="4-1-UpAndUpAndUp.ogg" data-nextid="id_snd15">4-1 Up Up And Up</button>
+		<button id="id_snd15" data-snd="4-2-UntilAtLastParadise.ogg" data-nextid="id_done">4-2 At Last Paradise</button>
 	</div>
-	<div class="idle hidden" id="id_doneblock">
+	<div class="controlpads centered hidden" id="id_doneblock">
 		<button id="id_done">Done!</button>
 	</div>
 </div>

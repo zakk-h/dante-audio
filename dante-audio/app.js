@@ -2,13 +2,12 @@ import './index.html';
 import './app.manifest';
 import '!!file-loader?name=[name].[ext]!./icon-192.webp';
 import '!!file-loader?name=[name].[ext]!./icon-512.webp';
-//import  './samples/Test-1-2.ogg';
 import  './samples/Ding-Ding.ogg';
 import  './samples/test-thunder.ogg';
-//import  './samples/WILDCAT.ogg';
 import  './samples/test-stereo-chimes.ogg';
 import  './samples/test-drum.ogg';
 import  './samples/test-wind.ogg';
+import  './samples/TrueThunderClap.ogg';
 import  './samples/1-1-Thunder.ogg';
 import  './samples/1-2-WhatLiesBeyond.ogg';
 import  './samples/1-3-WhatBecomesOfTheSouls.ogg';
@@ -26,6 +25,8 @@ import  './samples/4-1-UpAndUpAndUp.ogg';
 import  './samples/4-2-UntilAtLastParadise.ogg';
 import './samples/synth.ogg';
 import Pizzicato from 'pizzicato';
+
+const defaultSoundVolume = 80;
 
 /***
 On app startup, all audio buttons are connected to their respective sounds. The sounds can be
@@ -184,11 +185,17 @@ function danteAudioApp()
 	let sndFiles = document.querySelectorAll('button[data-snd]');
 	sndFiles.forEach(function(btn) {
 		let sndFile = btn.dataset.snd;
+		let soundvol = btn.dataset.loudness ? btn.dataset.loudness : defaultSoundVolume;
+		let userSoundVol = localStorage.getItem(`${btn.id}_volume`);
 		let nextBtnID = btn.dataset.nextid;
-		let snd = new Pizzicato.Sound({source:'file',options:{path:sndFile}}, function() {
-			loadedSounds[btn.id] = sndFile;
-		});
+		let sndoptarray = {
+			'path':   sndFile,
+			'attack': 0.1,
+			'volume': parseFloat(userSoundVol?userSoundVol:soundvol)/100
+		};
 
+		let snd = loadedSounds[btn.id] = new Pizzicato.Sound({'source':'file','options':sndoptarray}, function() {});
+		
 		btn.addEventListener('click',function(e) {
 			e.preventDefault();
 			if (btn.classList.contains('playing')) {
@@ -212,6 +219,47 @@ function danteAudioApp()
 		function stopPlay() {btn.classList.remove('playing');}
 		snd.on('stop', stopPlay);
 		snd.on('end', stopPlay);
+	});
+
+	function buildVolumeForm() {
+		let form = document.createElement('form');
+		let btns = document.querySelectorAll('.performance button[data-snd]');
+		btns.forEach(function(btn) {
+			let soundvol = btn.dataset.loudness ? btn.dataset.loudness : defaultSoundVolume;
+			let userSoundVol = localStorage.getItem(`${btn.id}_volume`);
+			let fieldset = document.createElement('fieldset');
+			let ctl = document.createElement('input');
+			let label = document.createElement('label');
+			label.for = ctl.id;
+			label.innerText = btn.innerText;
+			ctl.type = 'range'; ctl.min = 0; ctl.max=100;
+			ctl.value = userSoundVol?userSoundVol:soundvol;
+			fieldset.appendChild(ctl);			
+			fieldset.appendChild(label);
+			fieldset.classList.add('volume');
+			form.appendChild(fieldset);
+
+			ctl.onchange = function() {
+				let newVol = ctl.value;
+				localStorage.setItem(`${btn.id}_volume`,newVol);
+				if (loadedSounds[btn.id]) loadedSounds[btn.id].volume = parseFloat(newVol)/100;
+			}
+		});
+		return form;
+	}
+
+	let modal = document.querySelector('#id_dlgoptions');
+	let modalb = modal.querySelector('section');
+	let dlgVolume = false;
+	document.querySelector('.close').addEventListener('click',function() {
+		modal.classList.add('hidden');
+		modalb.removeChild(modalb.firstChild);
+	});
+	document.querySelector('#id_appheader').addEventListener('click',function() {
+		modalb.innerHTML = '';
+		if (!dlgVolume) dlgVolume = buildVolumeForm();
+		modalb.appendChild(dlgVolume);
+		modal.classList.remove('hidden');
 	});
 }
 
